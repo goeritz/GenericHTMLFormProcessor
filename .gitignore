@@ -1,0 +1,4 @@
+*.sublime*
+tests
+Makefile
+config.php
