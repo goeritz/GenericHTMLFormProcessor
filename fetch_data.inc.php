@@ -20,13 +20,19 @@
 
 */
 
+//the following line should be removed for productive use.
+require_once "config.php";
 
-//edit: connection details
-$user='username';
-$password='password';
-$host='localhost';
-$database='generic';
-$table='generic';
+//three lines you need to edit;
+//please replace MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB with the correct values for your database
+//do not forget to quote them, e.g. replace MYSQL_USER with "your_user_name"
+$user=MYSQL_USER;   //the username for the database (db) (if any), e.g. "user"
+$password=MYSQL_PASSWORD; //the password for the db (if any), e.g. "password"
+$database=MYSQL_DB; //name to be given to the db, e.g. "generic"
+
+//in most instances, you can leave the following 2 lines as they are
+$host="localhost"; //the host or IP address where the db is located
+$table="generic"; //name to be given to the table within the db
 
 //connect to db server and db
 mysql_connect($host,$user,$password);

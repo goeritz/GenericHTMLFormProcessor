@@ -11,13 +11,18 @@ The table columns and later their input are created/entered in alphabetical/nume
 the referer variable indicates which HTML form sent the data.
 */
 
-//two lines you need to edit; please alter only the words in quotes
-$user="username";  //the username for the database (db) (if any)
-$password="password"; //the password for the db (if any)
+//the following line should be removed for productive use.
+require_once "config.php";
 
-//in most instances, you can leave the following 3 lines as they are
+//three lines you need to edit;
+//please replace MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB with the correct values for your database
+//do not forget to quote them, e.g. replace MYSQL_USER with "your_user_name"
+$user=MYSQL_USER;  //the username for the database (db) (if any), e.g. "user"
+$password=MYSQL_PASSWORD; //the password for the db (if any), e.g. "password"
+$database=MYSQL_DB; //name to be given to the db, e.g. "generic"
+
+//in most instances, you can leave the following 2 lines as they are
 $host="localhost"; //the host or IP address where the db is located
-$database="generic"; //name to be given to the db
 $table="generic"; //name to be given to the table within the db
 
 /* Set the value of the following allfieldsfull-variable to "true" if you would 
