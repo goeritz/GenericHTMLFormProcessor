@@ -163,7 +163,7 @@ if (!isset ($identification))
 //create table, if not already there
 mysql_query ("CREATE TABLE $table (`identification` int(6) NOT NULL auto_increment, 
 `page1` LONGTEXT, `participation_date` DATE, `time_submit1` VARCHAR(100), `ip_number` VARCHAR(255), 
-`browser` VARCHAR(255), PRIMARY KEY  (`identification`)) TYPE=MyISAM");
+`browser` VARCHAR(255), PRIMARY KEY  (`identification`)) ENGINE=MyISAM");
 	}
 
 //change array, so that time_submit and page are renamed dynamically
