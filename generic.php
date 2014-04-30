@@ -14,6 +14,14 @@ the referer variable indicates which HTML form sent the data.
 //the following line should be removed for productive use.
 require_once "config.php";
 
+//the following line should be removed if you dont need password protection. Otherwise you have
+//to put the customized file 'password_protection.inc.php' in the same folder as this file.
+require_once "password_protection.inc.php";
+
+//the following line should be removed if you dont need input validation. Otherwise you have
+//to put the customized file 'input_validation.inc.php' in the same folder as this file.
+require_once "input_validation.inc.php";
+
 //three lines you need to edit;
 //please replace MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB with the correct values for your database
 //do not forget to quote them, e.g. replace MYSQL_USER with "your_user_name"
