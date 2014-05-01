@@ -11,6 +11,8 @@ The table columns and later their input are created/entered in alphabetical/nume
 the referer variable indicates which HTML form sent the data.
 */
 
+session_start();
+
 //the following line should be removed for productive use.
 require_once "config.php";
 
