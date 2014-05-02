@@ -2,15 +2,19 @@
 
 /* PHP template for fetching data base data that the participant submitted beforehand
 
-1. paste contents of this file into the body of the questionnaire page that is to re-use information from the database
+1. paste the following code at the very beginning of the questionnaire page that is to re-use information from the database
+
+<?php
+	require_once('fetch_data.inc.php')
+?>
 
 2. assign extension .php to that questionnaire page
 
-3. edit db connection details below
+3. edit db connection details below and copy this file into the same folder as the questionaire page is located
 
 4. edit names of variables that are fetched from db below
 
-5. re-use fetched variables as you please: display them, make calculations, build them into control structures such as loops or if-else, use them for random assignment to conditions, use them in skip patterns, ...
+5. re-use fetched variables as you please in the questionaire page: display them, make calculations, build them into control structures such as loops or if-else, use them for random assignment to conditions, use them in skip patterns, ...
 
 6. within php code you can call up a fetched variable directly, e.g., $answer1
 
@@ -19,6 +23,8 @@
 8. Done!
 
 */
+
+session_start();
 
 //the following line should be removed for productive use.
 require_once "config.php";
