@@ -59,12 +59,15 @@ $thank_you_text='Thank you! Your answers have been saved.';
 //#####################################################################
 //Load the $unsafe_variables associative array from appropriate array (either POST or GET)
 $unsafe_data = array_merge($_GET, $_POST);
-$unsafe_control_variables = array_filter($unsafe_data, function($key){
+$unsafe_control_keys = array_filter(array_keys($unsafe_data), function($key){
 	return strpos($key, 'GHFPvar_') === 0;
 });
-$unsafe_variables = array_filter($unsafe_data, function($key){
+$unsafe_variables_keys = array_filter(array_keys($unsafe_data), function($key){
 	return strpos($key, 'GHFPvar_') !== 0;
 });
+$unsafe_control_variables = array_intersect_key($unsafe_data, array_flip($unsafe_control_keys));
+$unsafe_variables = array_intersect_key($unsafe_data, array_flip($unsafe_variables_keys));
+
 //Backward compatibility for non-prefixed control variables:
 foreach(array('next_page', 'identification', 'counter') as $value){ // Put all old non-prefixed variables in this array
 	if(!isset($unsafe_control_variables['GHFPvar_' . $value]) && isset($unsafe_variables[$value])){
@@ -75,13 +78,8 @@ foreach(array('next_page', 'identification', 'counter') as $value){ // Put all o
 //if no data have been sent
 if (empty ($unsafe_variables)) {echo "There is no form input to be processed."; exit; }
 
-//determine whether this was a consecutive page of the questionnaire
-//grab hidden variable
-$identification = $unsafe_control_variables['GHFPvar_identification'];
-$counter = $unsafe_control_variables['GHFPvar_counter'];
-
-//if this is the first page of the survey, i.e., there is no $identification
-if (!isset ($identification)) 
+//if this is the first page of the survey, i.e., there is no $_SESSION['identification']
+if (!isset ($_SESSION['identification']))
 	{
 	$referer=$_SERVER['HTTP_REFERER'];
 	//if no referer info available
@@ -168,21 +166,20 @@ if ($order) {ksort ($unsafe_variables);}
 $next_page = $unsafe_control_variables['GHFPvar_next_page'];
 
 //counter for dynamic timestamp and next_page
-$counter_page = ++$counter+1;
+$counter_page = ++$_SESSION['counter']+1;
 
 //connect to db server
 mysql_connect($host,$user,$password) or die( 'Unable to connect to database server');
 
 //if this is the first page of a survey
-if (!isset ($identification)) 
+if (!isset ($_SESSION['identification']))
 	//create db, if not already there
 	{mysql_query("CREATE DATABASE $database"); }
 
 //select db
 @mysql_select_db($database) or die( 'Unable to select database');
 
-if (!isset ($identification)) 
-	{
+if (!isset ($_SESSION['identification'])){
 //create table, if not already there
 mysql_query ("CREATE TABLE $table (`GHFPvar_id` int(6) NOT NULL auto_increment,
 `GHFPvar_page1` LONGTEXT, `GHFPvar_participation_date` DATE, `GHFPvar_time_submit1` VARCHAR(100), `GHFPvar_ip_number` VARCHAR(255),
@@ -193,8 +190,8 @@ mysql_query ("CREATE TABLE $table (`GHFPvar_id` int(6) NOT NULL auto_increment,
 if(isset($next_page)){
 	$unsafe_variables["page".$counter_page] = $next_page;
 }
-if(isset($counter)){
-	$unsafe_variables["time_submit".$counter] = date("G:i:s");
+if(isset($_SESSION['counter'])){
+	$unsafe_variables["time_submit".$_SESSION['counter']] = date("G:i:s");
 }
 
 //for each line in the array of submitted variables do the following (traverse array)
@@ -203,20 +200,21 @@ foreach($unsafe_variables as $name=>$value) {
 		mysql_query ("ALTER TABLE $table ADD $name VARCHAR(255)");
 	 								}
 
-if (!isset ($identification)) 		{
+if (!isset ($_SESSION['identification'])){
 //insert new record into db table (into the referer field) and thus generate identifcation (new record)
 mysql_query("INSERT INTO $table (GHFPvar_page1, GHFPvar_participation_date, GHFPvar_time_submit1, GHFPvar_ip_number, GHFPvar_browser)
 VALUES ('$referer', '".date("Y-m-d")."', '".date("G:i:s")."', 
 '".$_SERVER['REMOTE_ADDR']."', '".$_SERVER['HTTP_USER_AGENT']."')")or die( "Unable to insert into table!"); 
 //grab last value of auto-increment variable "GHFPvar_id" to be used as identifier
-$identification = mysql_insert_id(); }
+	$_SESSION['identification'] = mysql_insert_id();
+}
 
 //for each line in the array of submitted variables do the following
-	foreach($unsafe_variables as $name=>$value){
-		   //echo $name." - ".$value."<br>"; //spits out array for control purposes
-			//update db table step by step
-			mysql_query("UPDATE $table SET $name='$value' WHERE GHFPvar_id=$identification") or die( "Unable to update table");
-											 }
+foreach($unsafe_variables as $name=>$value){
+	//echo $name." - ".$value."<br>"; //spits out array for control purposes
+	//update db table step by step
+	mysql_query("UPDATE $table SET $name='$value' WHERE GHFPvar_id=" . $_SESSION['identification']) or die( "Unable to update table");
+}
 //close connection
 mysql_close();
 
@@ -224,11 +222,12 @@ mysql_close();
 if (!isset ($next_page)) {echo $thank_you_text; }
 
 //if questionnaire consists of still another html page
-else 	{ //call up next HTML page and pass on ID and counter
-echo "<html><head></head><body onLoad=\"javascript:location.replace('".$next_page."?op56=".$identification."&nr93=".$counter."')\">
-<a href=\"".$next_page."?op56=".$identification."&nr93=".$counter."\">Next Page</a></body></html>"; 
-//manuelles Weiterklicken
-//echo "<html><head></head><body><a href=\"".$next_page."?op56=".$identification."&nr93=".$counter."\">Next Page</a></body></html>"; 
-		}
+else { //call up next HTML page and pass on ID and counter
+	$_SESSION['counter'] = $_SESSION['counter'];
+	echo "<html><head></head><body onLoad=\"javascript:location.replace('".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."')\">
+<a href=\"".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."\">Next Page</a></body></html>";
+	//manuelles Weiterklicken
+	//echo "<html><head></head><body><a href=\"".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."\">Next Page</a></body></html>"; 
+}
 ?>
 

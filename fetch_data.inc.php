@@ -24,6 +24,7 @@
 
 */
 
+//Never delete the following line
 session_start();
 
 //the following line should be removed for productive use.
@@ -46,7 +47,11 @@ mysql_select_db($database) or die('Unable to select database '.mysql_error());
 
 //grab data from db where id is id from query string
 //edit: variable names
-$result=mysql_query("SELECT GHFPvar_page1, GHFPvar_ip_number FROM $table WHERE GHFPvar_id=$_GET[op56]") or die ('Select failed! '.mysql_error());
+if(!isset($_SESSION['identification'])){
+	echo "No data stored in this session so far. You can only access data stored by an previous HTML Form during the same session.";
+	exit(1);
+}
+$result=mysql_query("SELECT GHFPvar_page1, GHFPvar_ip_number FROM $table WHERE GHFPvar_id=" . $_SESSION['identification']) or die ('Select failed! '.mysql_error());
 
 //get results as an array
 $row = mysql_fetch_row($result);
