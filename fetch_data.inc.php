@@ -46,7 +46,7 @@ mysql_select_db($database) or die('Unable to select database '.mysql_error());
 
 //grab data from db where id is id from query string
 //edit: variable names
-$result=mysql_query("SELECT page1, ip_number FROM $table WHERE identification=$_GET[op56]") or die ('Select failed! '.mysql_error());
+$result=mysql_query("SELECT GHFPvar_page1, GHFPvar_ip_number FROM $table WHERE GHFPvar_id=$_GET[op56]") or die ('Select failed! '.mysql_error());
 
 //get results as an array
 $row = mysql_fetch_row($result);
