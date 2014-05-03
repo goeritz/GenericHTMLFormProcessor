@@ -1,34 +1,54 @@
 <?php
 /* PHP template for password authentication using a password array 
 
-1. paste contents of this file after the <?php tag in Generic HTML Form Processor 
+1. uncomment the line
 
-2. put new usernames & corresponding password separated by : in the password array below
+   require_once "password_protection.inc.php";
 
-3. paste next line in HTML form that is to be validated 
-<input name="source" type="hidden" value="1">
+   in Generic HTML Form Processor and put this file in the same directory.
+
+2. put new usernames & corresponding password in the associative password array below
+
+3. Make sure the first HTML Form sends a username in a variable named "GHFPvar_user" and
+   a password in a variable named "GHFPvar_password". See password.htm as an example.
 
 4. Done!
 
 */
 
+$access = array(
+	'heart' => 'blue',  //replace with list of your usernames as keys and corresponding passwords as values
+	'love' => 'green'
+);
 
-if ($_POST[source] == "1") //validated HTML form contains variable "source" with value "1" 
+// Get user and password for backward compatibility
+if(isset($_POST['GHFPvar_user'])){
+	$user = $_POST['GHFPvar_user'];
+}
+else if($_POST['username']){
+	$user = $_POST['username'];
+}
+else{
+	$user = null;
+}
+if(isset($_POST['GHFPvar_password'])){
+	$pass = $_POST['GHFPvar_password'];
+}
+else if($_POST['password']){
+	$pass = $_POST['password'];
+}
+else{
+	$pass = null;
+}
 
-{$access = array('heart:blue','love:green'); //put username & corresponding password separated by : in here
-
-	foreach ($access as $line) 
-	{
-	list($user, $pw) = explode(':', $line); 
-		if (($user == $_POST[username]) && ($pw == $_POST[password])) 
-		{$auth = true; 
-		break; 
-		} 
-	} 
-	
-	if (!$auth)  //username and/or password was left blank or did not correspond to each other
-	{echo "You need to enter a valid username and password. They are case-sensitive.";
-	echo "<br><br><a href=\"javascript:history.back()\">back</a>";
-	exit;
+if($user && $pass){
+	if(isset($access[$user]) && $access[$user] == $pass){
+		$_SESSION['auth'] = $user;
 	}
+}
+
+if(!isset($_SESSION['auth']) || !$_SESSION['auth']){
+	echo "You need to enter a valid username and password. They are case-sensitive.";
+	echo "<br><br><a href=\"javascript:history.back()\">back</a>";
+	exit(1);
 }
