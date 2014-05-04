@@ -5,22 +5,29 @@
 1. paste the following code at the very beginning of the questionnaire page that is to re-use information from the database
 
 <?php
-	require_once('fetch_data.inc.php')
+	require_once('fetch_data.inc.php');
 ?>
 
-2. assign extension .php to that questionnaire page
+2. if the page that reuses the data is the final page of the study, e.g. the user will not input any new data to be stored
+   then add the following snippet at the very bottom of this questionary page:
 
-3. edit db connection details below and copy this file into the same folder as the questionaire page is located
+<?php
+	session_destroy();
+?>
 
-4. edit names of variables that are fetched from db below
+3. assign extension .php to that questionnaire page
 
-5. re-use fetched variables as you please in the questionaire page: display them, make calculations, build them into control structures such as loops or if-else, use them for random assignment to conditions, use them in skip patterns, ...
+4. edit db connection details below and copy this file into the same folder as the questionaire page is located
 
-6. within php code you can call up a fetched variable directly, e.g., $answer1
+5. edit names of variables that are fetched from db below
 
-7. within html code you can call up a fetched variable by opening a php block, e.g., <?php echo $answer1 ?>
+6. re-use fetched variables as you please in the questionaire page: display them, make calculations, build them into control structures such as loops or if-else, use them for random assignment to conditions, use them in skip patterns, ...
 
-8. Done!
+7. within php code you can call up a fetched variable directly, e.g., $answer1
+
+8. within html code you can call up a fetched variable by opening a php block, e.g., <?php echo $answer1 ?>
+
+9. Done!
 
 */
 

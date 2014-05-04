@@ -75,8 +75,11 @@ foreach(array('next_page', 'identification', 'counter') as $value){ // Put all o
 	}
 }
 
+//determine whether this was the last page of the questionnaire
+$next_page = $unsafe_control_variables['GHFPvar_next_page'];
+
 //if no data have been sent
-if (empty ($unsafe_variables)) {echo "There is no form input to be processed."; exit; }
+if (empty ($unsafe_variables) && empty($next_page)) {echo "There is no form input to be processed."; exit; }
 
 //if this is the first page of the survey, i.e., there is no $_SESSION['identification']
 if (!isset ($_SESSION['identification']))
@@ -162,9 +165,6 @@ foreach($unsafe_variables as $name=>$value)
 //sorts keys in array in numerical and alphabetical order 
 if ($order) {ksort ($unsafe_variables);}
 
-//determine whether this was the last page of the questionnaire
-$next_page = $unsafe_control_variables['GHFPvar_next_page'];
-
 //counter for dynamic timestamp and next_page
 $counter_page = ++$_SESSION['counter']+1;
 
@@ -219,7 +219,10 @@ foreach($unsafe_variables as $name=>$value){
 mysql_close();
 
 //if this is the last html page: feedback for the participant
-if (!isset ($next_page)) {echo $thank_you_text; }
+if (!isset ($next_page)) {
+	session_destroy();
+	echo $thank_you_text; 
+}
 
 //if questionnaire consists of still another html page
 else { //call up next HTML page and pass on ID and counter
