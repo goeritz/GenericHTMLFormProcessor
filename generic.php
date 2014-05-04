@@ -162,61 +162,117 @@ foreach($unsafe_variables as $name=>$value)
 		}					
 	}
 
-//sorts keys in array in numerical and alphabetical order 
-if ($order) {ksort ($unsafe_variables);}
-
 //counter for dynamic timestamp and next_page
 $counter_page = ++$_SESSION['counter']+1;
 
-//connect to db server
-mysql_connect($host,$user,$password) or die( 'Unable to connect to database server');
-
-//if this is the first page of a survey
-if (!isset ($_SESSION['identification']))
-	//create db, if not already there
-	{mysql_query("CREATE DATABASE $database"); }
-
-//select db
-@mysql_select_db($database) or die( 'Unable to select database');
-
-if (!isset ($_SESSION['identification'])){
-//create table, if not already there
-mysql_query ("CREATE TABLE $table (`GHFPvar_id` int(6) NOT NULL auto_increment,
-`GHFPvar_page1` LONGTEXT, `GHFPvar_participation_date` DATE, `GHFPvar_time_submit1` VARCHAR(100), `GHFPvar_ip_number` VARCHAR(255),
-`GHFPvar_browser` VARCHAR(255), PRIMARY KEY  (`GHFPvar_id`)) ENGINE=MyISAM");
-	}
-
 //Add meta-data (page address and time of submit) for subsequent pages in multi page questionaries.
 if(isset($next_page)){
-	$unsafe_variables["page".$counter_page] = $next_page;
+	$unsafe_variables['page'.$counter_page] = $next_page;
 }
 if(isset($_SESSION['counter'])){
-	$unsafe_variables["time_submit".$_SESSION['counter']] = date("G:i:s");
+	$unsafe_variables['time_submit'.$_SESSION['counter']] = date("G:i:s");
 }
 
-//for each line in the array of submitted variables do the following (traverse array)
-foreach($unsafe_variables as $name=>$value) {
-		//modify table step by step (add colums according to html input)
-		mysql_query ("ALTER TABLE $table ADD $name VARCHAR(255)");
-	 								}
+//sorts keys in array in numerical and alphabetical order
+if ($order){
+	ksort ($unsafe_variables);
+}
+
+// Establish mysql connection
+$mysql = new mysqli($host, $user, $password);
+if($mysql->connect_error){
+	die('Could not connect to database: ' . $mysql->connect_error);
+}
+
+// Escape all input keys and values and build description for columns
+$escaped_values = array();
+$escaped_keys = array();
+$column_def = array();
+foreach ($unsafe_variables as $key => $value) {
+	$escaped_values[$key] = $mysql->real_escape_string($value);
+	$escaped_keys[$key] = $mysql->real_escape_string($key);
+	$column_def[$key] = sprintf('`%s` VARCHAR(255)', $mysql->real_escape_string($key));
+}
+
+// Try to get information about table to use. If unsuccessful create DB and table.
+$res = $mysql->query('SHOW COLUMNS FROM generic FROM genericphp_db');
+if($mysql->errno != 0){
+	if($mysql->errno == 1146){ // Table and or Database doesnt exist. Let's create it.
+		$mysql->query("CREATE DATABASE IF NOT EXISTS $database") or
+			die('Could not create database (' . $mysql->errno . '): ' . $mysql->error);
+		$mysql->select_db($database);
+
+		if(count($column_def) > 0){
+			$columns = implode(', ', $column_def) . ', ';
+		}
+		else{
+			$columns = '';
+		}
+		$mysql->query("CREATE TABLE $table (`GHFPvar_id` int(6) NOT NULL auto_increment,
+											`GHFPvar_page1` LONGTEXT,
+											`GHFPvar_participation_date` DATE,
+											`GHFPvar_time_submit1` VARCHAR(100),
+											`GHFPvar_ip_number` VARCHAR(255),
+											`GHFPvar_browser` VARCHAR(255),
+											$columns
+											PRIMARY KEY (`GHFPvar_id`))
+							  ENGINE=MyISAM") or
+			die('Could not create table (' . $mysql->errno . '): ' . $mysql->error);
+	}
+	else{ // Unknown Error
+		die('Unable to get information about table (' . $mysql->errno . '): ' . $mysql->error);
+	}
+}
+else{ // Table exists but might need chacges
+	$mysql->select_db($database);
+
+	$known_keys = array();
+	while($row = $res->fetch_assoc()){ // Collect columnnames from database
+		$known_keys[] = $row['Field'];
+	}
+	$new_columns = array_diff_key($column_def, array_flip($known_keys)); // Collect column definitions for keys not yet in DB
+	if(count($new_columns) > 0){
+		$columns = implode(', ', $new_columns);
+		$mysql->query("ALTER TABLE $table ADD ($columns)") or
+			die('Could not alter table (' . $mysql->errno . '): ' . $mysql->error);
+	}
+}
 
 if (!isset ($_SESSION['identification'])){
-//insert new record into db table (into the referer field) and thus generate identifcation (new record)
-mysql_query("INSERT INTO $table (GHFPvar_page1, GHFPvar_participation_date, GHFPvar_time_submit1, GHFPvar_ip_number, GHFPvar_browser)
-VALUES ('$referer', '".date("Y-m-d")."', '".date("G:i:s")."', 
-'".$_SERVER['REMOTE_ADDR']."', '".$_SERVER['HTTP_USER_AGENT']."')")or die( "Unable to insert into table!"); 
-//grab last value of auto-increment variable "GHFPvar_id" to be used as identifier
-	$_SESSION['identification'] = mysql_insert_id();
+	//insert new record into db table (into the referer field) and thus generate identifcation (new record)
+	if(count($unsafe_variables) > 0){
+		$columnnames = ', ' . implode(', ', $escaped_keys);
+		$values = ', \'' . implode('\', \'', $escaped_values) . '\'';
+	}
+	$mysql->query("INSERT INTO $table (GHFPvar_page1,
+									   GHFPvar_participation_date,
+									   GHFPvar_time_submit1,
+									   GHFPvar_ip_number,
+									   GHFPvar_browser
+									   $columnnames
+									  )
+						  VALUES ('$referer',
+								  '" . date("Y-m-d") . "',
+								  '" . date("G:i:s") . "',
+								  '" . $mysql->real_escape_string($_SERVER['REMOTE_ADDR']) . "', 
+								  '" . $mysql->real_escape_string($_SERVER['HTTP_USER_AGENT']) . "'
+								  $values
+								 )") or
+		die('Unable to insert into table (' . $mysql->errno . '): ' . $mysql->error);
+	//grab last value of auto-increment variable "GHFPvar_id" to be used as identifier
+	$_SESSION['identification'] = $mysql->insert_id;
+}
+else if(count($unsafe_variables) > 0){
+	//Generate SET string
+	$expressions = array();
+	foreach($unsafe_variables as $key => $value){
+		$expressions[] = sprintf('%s=\'%s\'', $escaped_keys[$key], $escaped_values[$key]); 
+	}
+	$expressions_str = implode(', ', $expressions);
+	$mysql->query("UPDATE $table SET $expressions_str WHERE GHFPvar_id=" . $_SESSION['identification']);
 }
 
-//for each line in the array of submitted variables do the following
-foreach($unsafe_variables as $name=>$value){
-	//echo $name." - ".$value."<br>"; //spits out array for control purposes
-	//update db table step by step
-	mysql_query("UPDATE $table SET $name='$value' WHERE GHFPvar_id=" . $_SESSION['identification']) or die( "Unable to update table");
-}
-//close connection
-mysql_close();
+$mysql->close();
 
 //if this is the last html page: feedback for the participant
 if (!isset ($next_page)) {
