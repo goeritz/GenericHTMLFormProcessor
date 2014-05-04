@@ -9,6 +9,8 @@ This script parses the input from any HTML form. Among others it can process inp
 This script creates a MySQL DB and one table in it (if not yet present) containing columns that are named according to the variables that were submitted with the HTML form. 
 The table columns and later their input are created/entered in alphabetical/numerical order. For easier identification of users (especially if several people use the same script) 
 the referer variable indicates which HTML form sent the data.
+
+Authors: Anja Göritz <goeritz /at\ psychologie.uni-freiburg.de>, Jan Vogt <jan.vogt /at\ me.com>
 */
 
 //Never delete the following line
@@ -184,7 +186,7 @@ if($mysql->connect_error){
 	die('Could not connect to database: ' . $mysql->connect_error);
 }
 
-// Escape all input keys and values and build description for columns
+// Escape all input keys and values and build description for columns to prevent SQL injections
 $escaped_values = array();
 $escaped_keys = array();
 $column_def = array();
@@ -254,7 +256,7 @@ if (!isset ($_SESSION['identification'])){
 						  VALUES ('$referer',
 								  '" . date("Y-m-d") . "',
 								  '" . date("G:i:s") . "',
-								  '" . $mysql->real_escape_string($_SERVER['REMOTE_ADDR']) . "', 
+								  '" . $mysql->real_escape_string($_SERVER['REMOTE_ADDR']) . "',
 								  '" . $mysql->real_escape_string($_SERVER['HTTP_USER_AGENT']) . "'
 								  $values
 								 )") or
@@ -266,7 +268,7 @@ else if(count($unsafe_variables) > 0){
 	//Generate SET string
 	$expressions = array();
 	foreach($unsafe_variables as $key => $value){
-		$expressions[] = sprintf('%s=\'%s\'', $escaped_keys[$key], $escaped_values[$key]); 
+		$expressions[] = sprintf('%s=\'%s\'', $escaped_keys[$key], $escaped_values[$key]);
 	}
 	$expressions_str = implode(', ', $expressions);
 	$mysql->query("UPDATE $table SET $expressions_str WHERE GHFPvar_id=" . $_SESSION['identification']);
