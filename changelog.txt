@@ -1,0 +1,74 @@
+commit 2f90a2600a543c4b0fbba8a553e7a4e86b9fdb61
+Date:   Sun May 4 22:32:55 2014 +0200
+
+    Update all examples for current API
+
+commit 2cb85f677ca1f3a50b38049dbabfe044f415b01e
+Date:   Sun May 4 22:23:18 2014 +0200
+
+    Create README file with updated information from brmic website
+
+commit 82037a651f80eb9ff6e3fc1efb07aa7a600e2a82
+Date:   Sun May 4 19:35:28 2014 +0200
+
+    Add cosmetics, such as author changes
+
+commit 8b817614d238974a596630510acb37341e80972e
+Date:   Sun May 4 19:24:48 2014 +0200
+
+    Change DB-connector to PHPs mysqli. Minimize database queries as much as possible (most of the times two queries per run). Escape all unsafe values to prevent SQL injection.
+
+commit 7d021e344b293c7943fc1529c19e609842d46143
+Date:   Sun May 4 14:08:22 2014 +0200
+
+    Update input_validation for use of prefixed control value. Don't use implicit string constants anymore
+
+commit 4082246a919213e380ae9eb476528f97df76ff4e
+Date:   Sun May 4 13:54:24 2014 +0200
+
+    Keep session alive if next_page is set even if there is no data to store. Ensure session will be closed appropriately even if last page is a page which fetches data from the database by updated inline documentation.
+
+commit b156b610c00caf7139f94b2fe1e050c59d187b5c
+Date:   Sat May 3 20:48:25 2014 +0200
+
+    Store control variables like identification and counter in session storage. Update fetch_data appropriately and add informative message if no data stored in this session so far.
+
+commit e543a592b9fd0423fd3ff1b970dab766f977bdc7
+Date:   Sat May 3 13:38:20 2014 +0200
+
+    Prefix all internal variables with GHFPvar_* and therefore avoid conflicts with form data intended to be stored (such as browser). Data sent by the HTML form that is prefixed will not be stored, that is only variables intended to control Generic HTML Form Processor should be prefixed.
+
+commit 346a354d4bb2a2129d5b6fbf037897ae2419f5a5
+Date:   Sat May 3 11:50:59 2014 +0200
+
+    Implement session-based password protection. Update example login form accordingly. Update inline documentation accordingly.
+
+commit 1de6b99d11c3abf4c72b99e4f1ca9c2d9f8e4824
+Date:   Fri May 2 11:47:01 2014 +0200
+
+    Add test file for data retrieval, add session_start() to fetch_data snippet, update inline documentation.
+
+commit 8c46a33ceb9cefef70e7266c6f903c35baedaf18
+Date:   Thu May 1 16:59:40 2014 +0200
+
+    Add session_start to enable session-based functionality
+
+commit b54230aab2f36fed513635c95d99fb20d342a4e2
+Date:   Wed Apr 30 18:31:42 2014 +0200
+
+    Include input_validation and passwort_protection by default. It only requires the files to be in the same folder and does not affect functionality if not used. Instructions to delete the requirement are given in generic.php.
+
+commit dc7c24cb7bc0a75de60c8045a0f8e1a5e1ecf25c
+Date:   Tue Apr 29 12:27:38 2014 +0200
+
+    Replace deprecated TYPE keyword with ENGINE for current mysql versions
+
+commit 184f11f4df59224eb93952eaad7467b32d068221
+Date:   Tue Apr 29 02:54:15 2014 +0200
+
+    Set user credentials for development and update documentation
+
+commit c269863fe6adb3b58e0ae4d490b46f744fd5a7c5
+Date:   Tue Apr 29 02:39:23 2014 +0200
+
+    Initial commit: Set up consistent file hierarchy and consistent use of <?php ... ?> tagging style across all files
