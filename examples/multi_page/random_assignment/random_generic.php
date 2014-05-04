@@ -18,6 +18,6 @@ else {$link = 'page1b.htm';}
 ?>
 
 <form action="generic.php" method="post">
-<input type="hidden" name="next_page" value="<?php echo $link ?>">
+<input type="hidden" name="GHFPvar_next_page" value="<?php echo $link ?>">
 <input value="Start the Study" type="submit">
 </form></body></html>
