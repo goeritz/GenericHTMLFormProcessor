@@ -197,7 +197,7 @@ foreach ($unsafe_variables as $key => $value) {
 }
 
 // Try to get information about table to use. If unsuccessful create DB and table.
-$res = $mysql->query('SHOW COLUMNS FROM generic FROM genericphp_db');
+$res = $mysql->query("SHOW COLUMNS FROM $table FROM $database");
 if($mysql->errno != 0){
 	if($mysql->errno == 1146){ // Table and or Database doesnt exist. Let's create it.
 		$mysql->query("CREATE DATABASE IF NOT EXISTS $database") or
