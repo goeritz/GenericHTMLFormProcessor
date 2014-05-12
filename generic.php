@@ -91,8 +91,8 @@ if (!isset ($_SESSION['identification']))
 	if (!isset ($referer)) 
 		{	
 		//if there is a manually entered referer
-		if (isset ($referer_man)) 
-			{
+		if (isset ($unsafe_control_variables['GHFPvar_referer_man'])) {
+			$referer_man = $unsafe_control_variables['GHFPvar_referer_man'];
 		//remove whitespace and other characters from end and beginning of referer
 		$referer_man = rtrim ($referer_man, "/ \t\n\r\0\x0B.");
 		$referer_man = ltrim ($referer_man, "/ \t\n\r\0\x0B.");
@@ -119,16 +119,13 @@ if (!isset ($_SESSION['identification']))
 				{
 			$referer=$referer_man;
 			//replace irrelevant array from Referer-Alert-Page with array from last survey page
-			$unsafe_variables2 = preg_replace("/Q#Q#Q/", "\"", $unsafe_variables2);
-			$unsafe_variables = unserialize ($unsafe_variables2);
+			$unsafe_variables = $_SESSION['stored_for_referer'];
 				}
 			}
 		//if there is no manually entered referer
 		else
 			{
-		$unsafe_variables2 = serialize ($unsafe_variables);
-		//replace " with Q#Q#Q
-		$unsafe_variables2 = preg_replace("/\"/", "Q#Q#Q", $unsafe_variables2);
+		$_SESSION['stored_for_referer'] = $unsafe_variables;
 		
 		echo "Your data cannot be saved because your browser did not send the HTTP \"Referer\". 
 		That is the Web address of the questionnaire you have sumitted.
@@ -140,8 +137,8 @@ if (!isset ($_SESSION['identification']))
 		- Go <a href=\"javascript:history.back()\">back to the last page</a>, copy the URL (Web address), 
 		hit the submit button, paste the complete URL into the field below and press \"Proceed\":
 		<br><br><html><head></head><body><form method=\"post\" action=\"generic.php\">
-		<input type=\"text\" name=\"referer_man\" size=\"42\">
-		<input type=\"hidden\" name=\"variablen2\" value=\"$unsafe_variables2\"><input type=\"submit\" value=\"Proceed\">
+		<input type=\"text\" name=\"GHFPvar_referer_man\" size=\"42\">
+		<input type=\"submit\" value=\"Proceed\">
 		</form></body></html> ";
 		exit;
 			}
@@ -253,7 +250,7 @@ if (!isset ($_SESSION['identification'])){
 									   GHFPvar_browser
 									   $columnnames
 									  )
-						  VALUES ('$referer',
+						  VALUES ('" . $mysql->real_escape_string($referer) . "',
 								  '" . date("Y-m-d") . "',
 								  '" . date("G:i:s") . "',
 								  '" . $mysql->real_escape_string($_SERVER['REMOTE_ADDR']) . "',
