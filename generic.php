@@ -91,10 +91,10 @@ if (!isset ($_SESSION['identification']))
 	if (!isset ($referer)) 
 		{	
 		//if there is a manually entered referer
-		if (isset ($referer_man)) 
+		if (isset ($unsafe_variables['referer_man'])) 
 			{
 		//remove whitespace and other characters from end and beginning of referer
-		$referer_man = rtrim ($referer_man, "/ \t\n\r\0\x0B.");
+		$referer_man = rtrim ($unsafe_variables['referer_man'], "/ \t\n\r\0\x0B.");
 		$referer_man = ltrim ($referer_man, "/ \t\n\r\0\x0B.");
 
 			//if $referer_man is obviously false or empty
