@@ -7,8 +7,8 @@ Software is "as is," no guarantees or warranties can be made.
 
 This script parses the input from any HTML form. Among others it can process input from forms that were created using SurveyWiz (Copyright: Michael Birnbaum). 
 This script creates a MySQL DB and one table in it (if not yet present) containing columns that are named according to the variables that were submitted with the HTML form. 
-The table columns and later their input are created/entered in alphabetical/numerical order. For easier identification of users (especially if several people use the same script) 
-the referer variable indicates which HTML form sent the data.
+The table columns and later their input are created/entered in alphabetical/numerical order. For easier identification of projects (especially if several projects use the same script) 
+unless the browser is configured to omit the referer info it is indicated which HTML form sent the data.
 
 Authors: Anja Göritz <goeritz /at\ psychologie.uni-freiburg.de>, Jan Vogt <jan.vogt /at\ me.com>
 */
@@ -82,12 +82,6 @@ $next_page = $unsafe_control_variables['GHFPvar_next_page'];
 
 //if no data have been sent
 if (empty ($unsafe_variables) && empty($next_page)) {echo "There is no form input to be processed."; exit; }
-
-//if this is the first page of the survey, i.e., there is no $_SESSION['identification']
-if (!isset ($_SESSION['identification']))
-	{
-	$referer=$_SERVER['HTTP_REFERER'];
-	}
 
 //input validation: for each line in the array of submitted variables do the following
 if ($allfieldsfull) 
@@ -190,7 +184,7 @@ if (!isset ($_SESSION['identification'])){
 									   GHFPvar_browser
 									   $columnnames
 									  )
-						  VALUES ('" . $mysql->real_escape_string($referer) . "',
+						  VALUES ('" . $mysql->real_escape_string($_SERVER['HTTP_REFERER']) . "',
 								  '" . date("Y-m-d") . "',
 								  '" . date("G:i:s") . "',
 								  '" . $mysql->real_escape_string($_SERVER['REMOTE_ADDR']) . "',
