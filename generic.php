@@ -87,67 +87,7 @@ if (empty ($unsafe_variables) && empty($next_page)) {echo "There is no form inpu
 if (!isset ($_SESSION['identification']))
 	{
 	$referer=$_SERVER['HTTP_REFERER'];
-	//if no referer info available
-	if (!isset ($referer)) 
-		{	
-		//if there is a manually entered referer
-		if (isset ($unsafe_control_variables['GHFPvar_referer_man'])) {
-			$referer_man = $unsafe_control_variables['GHFPvar_referer_man'];
-
-		//remove whitespace and other characters from end and beginning of referer
-		$referer_man = rtrim ($referer_man, "/ \t\n\r\0\x0B.");
-		$referer_man = ltrim ($referer_man, "/ \t\n\r\0\x0B.");
-			//if $referer_man is obviously false or empty
-			if (($referer_man == "http://www.goeritz.net/brmic/generic.php") 
-			OR ($referer_man == "")
-			OR (!strrpos ($referer_man, "|")==false)
-			OR (!strrpos ($referer_man, "<")==false)
-			OR (!strrpos ($referer_man, ">")==false)
-			OR (!strrpos ($referer_man, "[")==false)
-			OR (!strrpos ($referer_man, "]")==false))
-				{
-			echo "The referer you entered seems to be wrong. Please make sure you enter the URL
-			 (Web address) of the first page of the study! <br>
-			Go <a href=\"javascript:history.go(-2)\">back to the first page of the study</a>, copy the URL (Web address), 
-			hit the submit button, on the following page paste the complete URL into the field and press \"Proceed\".
-			";
-			exit;
-				}
-
-			//if $referer_man is correct
-			else 
-				{
-			$referer=$referer_man;
-			//replace irrelevant array from Referer-Alert-Page with array from last survey page
-			$unsafe_variables = $_SESSION['stored_for_referer'];
-				}
-			}
-		//if there is no manually entered referer
-		else
-			{
-		$_SESSION['stored_for_referer'] = $unsafe_variables;
-		
-		echo "Your data cannot be saved because your browser did not send the HTTP \"Referer\". 
-		That is the Web address of the questionnaire you have sumitted.
-		This can be for several reasons, but most commonly it is because your browser does not know about this header, has been configured not to send one, or is behind a proxy or firewall that strips it out of the request before it reaches us.
-		<br><br>You can try one or more of the following to solve this problem:<br>
-		- If you know how it is done configure your browser to send the referer header. <br>
-		- Use another browser to fill in this form, which is (hopefully) configured to send the referer header. <br>
-		- Use another browser, which is not behind a proxy or firewall and therefore (hopefully) does not strip out the referer header. <br>
-		- Go <a href=\"javascript:history.back()\">back to the last page</a>, copy the URL (Web address), 
-		hit the submit button, paste the complete URL into the field below and press \"Proceed\":
-		<br><br><html><head></head><body><form method=\"post\" action=\"generic.php\">
-		<input type=\"text\" name=\"GHFPvar_referer_man\" size=\"42\">
-		<input type=\"submit\" value=\"Proceed\">
-		</form></body></html> ";
-		exit;
-			}
-		}
-	//if referer da
-	else 
-	{$referer = rtrim ($referer,"/ \t\n\r\0\x0B.");
 	}
-}
 
 //input validation: for each line in the array of submitted variables do the following
 if ($allfieldsfull) 
@@ -222,7 +162,7 @@ if($mysql->errno != 0){
 		die('Unable to get information about table (' . $mysql->errno . '): ' . $mysql->error);
 	}
 }
-else{ // Table exists but might need chacges
+else{ // Table exists but might need changes
 	$mysql->select_db($database);
 
 	$known_keys = array();
