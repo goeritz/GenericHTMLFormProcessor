@@ -5,25 +5,25 @@ You may copy and modify this program, as long as you copy this copyright notice.
 If you do use it, please cite this article in works that benefitted from its use. 
 Software is "as is," no guarantees or warranties can be made. 
 
-This script parses the input from any HTML form. Among others it can process input from forms that were created using SurveyWiz (Copyright: Michael Birnbaum). 
-This script creates a MySQL DB and one table in it (if not yet present) containing columns that are named according to the variables that were submitted with the HTML form. 
-The table columns and later their input are created/entered in alphabetical/numerical order. For easier identification of projects (especially if several projects use the same script) 
+This script parses the input from any HTML form. This script creates a MySQL DB and one table in it 
+(if not yet present) containing columns that are named according to the variables that were submitted with the HTML form. 
+For easier identification of projects (especially if several projects use the same script), 
 unless the browser is configured to omit the referer info it is indicated which HTML form sent the data.
 
-Authors: Anja Göritz <goeritz /at\ psychologie.uni-freiburg.de>, Jan Vogt <jan.vogt /at\ me.com>
+Authors: Anja S. Göritz <anja /at\ goeritz.net>, Jan Vogt <jan.vogt /at\ me.com>
 */
 
 //Never delete the following line
 session_start();
 
-//the following line should be removed for productive use.
+//the following line should be removed (e.g., simply put // in front) for productive use.
 require_once "config.php";
 
-//the following line should be removed if you dont need password protection. Otherwise you have
+//the following line should be removed if you dont need password protection (e.g., simply put // in front). Otherwise you need
 //to put the customized file 'password_protection.inc.php' in the same folder as this file.
 require_once "password_protection.inc.php";
 
-//the following line should be removed if you dont need input validation. Otherwise you have
+//the following line should be removed (e.g., simply put // in front) if you dont need input validation. Otherwise you need
 //to put the customized file 'input_validation.inc.php' in the same folder as this file.
 require_once "input_validation.inc.php";
 
@@ -218,7 +218,7 @@ else { //call up next HTML page and pass on ID and counter
 	$_SESSION['counter'] = $_SESSION['counter'];
 	echo "<html><head></head><body onLoad=\"javascript:location.replace('".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."')\">
 <a href=\"".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."\">Next Page</a></body></html>";
-	//manuelles Weiterklicken
+	//move on by clicking
 	//echo "<html><head></head><body><a href=\"".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."\">Next Page</a></body></html>"; 
 }
 ?>
