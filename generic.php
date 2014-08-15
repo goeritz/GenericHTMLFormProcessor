@@ -38,6 +38,13 @@ $database=MYSQL_DB; //name to be given to the db, e.g. "generic"
 $host="localhost"; //the host or IP address where the db is located
 $table="generic"; //name to be given to the table within the db
 
+// Productive mode:
+// Set to true if the study fully developed and at least all possible branches
+// are run once with all variables set.
+// Setting this to true disables all debug information and increases security
+// by disallowing the creation of new columns in tables.
+$productive = false; // Set to true when collecting data
+
 /* Set the value of the following allfieldsfull-variable to "true" if you would 
 like to perform a validation on every submitted form element to make sure that it is not blank. 
 If you do not wish any validation leave value at "false" */
@@ -59,6 +66,18 @@ $thank_you_text='Thank you! Your answers have been saved.';
 
 //leave the rest from here on unchanged
 //#####################################################################
+
+// Only print $reason if not in productive mode
+function contextDie($reason) {
+	if($productive) {
+		// Print generic Error Message
+		die('Unexpected Error!');
+	}
+	else {
+		die($reason);
+	}
+}
+
 //Load the $unsafe_variables associative array from appropriate array (either POST or GET)
 $unsafe_data = array_merge($_GET, $_POST);
 $unsafe_control_keys = array_filter(array_keys($unsafe_data), function($key){
@@ -107,7 +126,7 @@ if ($order){
 // Establish mysql connection
 $mysql = new mysqli($host, $user, $password);
 if($mysql->connect_error){
-	die('Could not connect to database: ' . $mysql->connect_error);
+	contextDie('Could not connect to database: ' . $mysql->connect_error);
 }
 
 // Escape all input keys and values and build description for columns to prevent SQL injections
@@ -123,9 +142,9 @@ foreach ($unsafe_variables as $key => $value) {
 // Try to get information about table to use. If unsuccessful create DB and table.
 $res = $mysql->query("SHOW COLUMNS FROM $table FROM $database");
 if($mysql->errno != 0){
-	if($mysql->errno == 1146){ // Table and or Database doesnt exist. Let's create it.
+	if(!$productive && $mysql->errno == 1146){ // Table and or Database doesnt exist. Let's create it.
 		$mysql->query("CREATE DATABASE IF NOT EXISTS $database") or
-			die('Could not create database (' . $mysql->errno . '): ' . $mysql->error);
+			contextDie('Could not create database (' . $mysql->errno . '): ' . $mysql->error);
 		$mysql->select_db($database);
 
 		if(count($column_def) > 0){
@@ -143,10 +162,10 @@ if($mysql->errno != 0){
 											$columns
 											PRIMARY KEY (`GHFPvar_id`))
 							  ENGINE=MyISAM") or
-			die('Could not create table (' . $mysql->errno . '): ' . $mysql->error);
+			contextDie('Could not create table (' . $mysql->errno . '): ' . $mysql->error);
 	}
 	else{ // Unknown Error
-		die('Unable to get information about table (' . $mysql->errno . '): ' . $mysql->error);
+		contextDie('Unable to get information about table (' . $mysql->errno . '): ' . $mysql->error);
 	}
 }
 else{ // Table exists but might need changes
@@ -158,9 +177,14 @@ else{ // Table exists but might need changes
 	}
 	$new_columns = array_diff_key($column_def, array_flip($known_keys)); // Collect column definitions for keys not yet in DB
 	if(count($new_columns) > 0){
-		$columns = implode(', ', $new_columns);
-		$mysql->query("ALTER TABLE $table ADD ($columns)") or
-			die('Could not alter table (' . $mysql->errno . '): ' . $mysql->error);
+		if(!$productive) {
+			$columns = implode(', ', $new_columns);
+			$mysql->query("ALTER TABLE $table ADD ($columns)") or
+			contextDie('Could not alter table (' . $mysql->errno . '): ' . $mysql->error);
+		}
+		else {
+			contextDie('');
+		}
 	}
 }
 
@@ -184,7 +208,7 @@ if (!isset ($_SESSION['identification'])){
 								  '" . $mysql->real_escape_string($_SERVER['HTTP_USER_AGENT']) . "'
 								  $values
 								 )") or
-		die('Unable to insert into table (' . $mysql->errno . '): ' . $mysql->error);
+		contextDie('Unable to insert into table (' . $mysql->errno . '): ' . $mysql->error);
 	//grab last value of auto-increment variable "GHFPvar_id" to be used as identifier
 	$_SESSION['identification'] = $mysql->insert_id;
 }
