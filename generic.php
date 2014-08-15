@@ -5,25 +5,25 @@ You may copy and modify this program, as long as you copy this copyright notice.
 If you do use it, please cite this article in works that benefitted from its use. 
 Software is "as is," no guarantees or warranties can be made. 
 
-This script parses the input from any HTML form. Among others it can process input from forms that were created using SurveyWiz (Copyright: Michael Birnbaum). 
-This script creates a MySQL DB and one table in it (if not yet present) containing columns that are named according to the variables that were submitted with the HTML form. 
-The table columns and later their input are created/entered in alphabetical/numerical order. For easier identification of users (especially if several people use the same script) 
-the referer variable indicates which HTML form sent the data.
+This script parses the input from any HTML form. This script creates a MySQL DB and one table in it 
+(if not yet present) containing columns that are named according to the variables that were submitted with the HTML form. 
+For easier identification of projects (especially if several projects use the same script), 
+unless the browser is configured to omit the referer info it is indicated which HTML form sent the data.
 
-Authors: Anja Göritz <goeritz /at\ psychologie.uni-freiburg.de>, Jan Vogt <jan.vogt /at\ me.com>
+Authors: Anja S. Göritz <anja /at\ goeritz.net>, Jan Vogt <jan.vogt /at\ me.com>
 */
 
 //Never delete the following line
 session_start();
 
-//the following line should be removed for productive use.
+//the following line should be removed (e.g., simply put // in front) for productive use.
 require_once "config.php";
 
-//the following line should be removed if you dont need password protection. Otherwise you have
+//the following line should be removed if you dont need password protection (e.g., simply put // in front). Otherwise you need
 //to put the customized file 'password_protection.inc.php' in the same folder as this file.
 require_once "password_protection.inc.php";
 
-//the following line should be removed if you dont need input validation. Otherwise you have
+//the following line should be removed (e.g., simply put // in front) if you dont need input validation. Otherwise you need
 //to put the customized file 'input_validation.inc.php' in the same folder as this file.
 require_once "input_validation.inc.php";
 
@@ -75,72 +75,6 @@ $next_page = $unsafe_control_variables['GHFPvar_next_page'];
 
 //if no data have been sent
 if (empty ($unsafe_variables) && empty($next_page)) {echo "There is no form input to be processed."; exit; }
-
-//if this is the first page of the survey, i.e., there is no $_SESSION['identification']
-if (!isset ($_SESSION['identification']))
-	{
-	$referer=$_SERVER['HTTP_REFERER'];
-	//if no referer info available
-	if (!isset ($referer)) 
-		{	
-		//if there is a manually entered referer
-		if (isset ($unsafe_control_variables['GHFPvar_referer_man'])) {
-			$referer_man = $unsafe_control_variables['GHFPvar_referer_man'];
-
-		//remove whitespace and other characters from end and beginning of referer
-		$referer_man = rtrim ($referer_man, "/ \t\n\r\0\x0B.");
-		$referer_man = ltrim ($referer_man, "/ \t\n\r\0\x0B.");
-			//if $referer_man is obviously false or empty
-			if (($referer_man == "http://www.goeritz.net/brmic/generic.php") 
-			OR ($referer_man == "")
-			OR (!strrpos ($referer_man, "|")==false)
-			OR (!strrpos ($referer_man, "<")==false)
-			OR (!strrpos ($referer_man, ">")==false)
-			OR (!strrpos ($referer_man, "[")==false)
-			OR (!strrpos ($referer_man, "]")==false))
-				{
-			echo "The referer you entered seems to be wrong. Please make sure you enter the URL
-			 (Web address) of the first page of the study! <br>
-			Go <a href=\"javascript:history.go(-2)\">back to the first page of the study</a>, copy the URL (Web address), 
-			hit the submit button, on the following page paste the complete URL into the field and press \"Proceed\".
-			";
-			exit;
-				}
-
-			//if $referer_man is correct
-			else 
-				{
-			$referer=$referer_man;
-			//replace irrelevant array from Referer-Alert-Page with array from last survey page
-			$unsafe_variables = $_SESSION['stored_for_referer'];
-				}
-			}
-		//if there is no manually entered referer
-		else
-			{
-		$_SESSION['stored_for_referer'] = $unsafe_variables;
-		
-		echo "Your data cannot be saved because your browser did not send the HTTP \"Referer\". 
-		That is the Web address of the questionnaire you have sumitted.
-		This can be for several reasons, but most commonly it is because your browser does not know about this header, has been configured not to send one, or is behind a proxy or firewall that strips it out of the request before it reaches us.
-		<br><br>You can try one or more of the following to solve this problem:<br>
-		- If you know how it is done configure your browser to send the referer header. <br>
-		- Use another browser to fill in this form, which is (hopefully) configured to send the referer header. <br>
-		- Use another browser, which is not behind a proxy or firewall and therefore (hopefully) does not strip out the referer header. <br>
-		- Go <a href=\"javascript:history.back()\">back to the last page</a>, copy the URL (Web address), 
-		hit the submit button, paste the complete URL into the field below and press \"Proceed\":
-		<br><br><html><head></head><body><form method=\"post\" action=\"generic.php\">
-		<input type=\"text\" name=\"GHFPvar_referer_man\" size=\"42\">
-		<input type=\"submit\" value=\"Proceed\">
-		</form></body></html> ";
-		exit;
-			}
-		}
-	//if referer da
-	else 
-	{$referer = rtrim ($referer,"/ \t\n\r\0\x0B.");
-	}
-}
 
 //input validation: for each line in the array of submitted variables do the following
 if ($allfieldsfull) 
@@ -215,7 +149,7 @@ if($mysql->errno != 0){
 		die('Unable to get information about table (' . $mysql->errno . '): ' . $mysql->error);
 	}
 }
-else{ // Table exists but might need chacges
+else{ // Table exists but might need changes
 	$mysql->select_db($database);
 
 	$known_keys = array();
@@ -243,7 +177,7 @@ if (!isset ($_SESSION['identification'])){
 									   GHFPvar_browser
 									   $columnnames
 									  )
-						  VALUES ('" . $mysql->real_escape_string($referer) . "',
+						  VALUES ('" . $mysql->real_escape_string($_SERVER['HTTP_REFERER']) . "',
 								  '" . date("Y-m-d") . "',
 								  '" . date("G:i:s") . "',
 								  '" . $mysql->real_escape_string($_SERVER['REMOTE_ADDR']) . "',
@@ -277,8 +211,8 @@ else { //call up next HTML page and pass on ID and counter
 	$_SESSION['counter'] = $_SESSION['counter'];
 	echo "<html><head></head><body onLoad=\"javascript:location.replace('".$next_page."')\">
 <a href=\"".$next_page."\">Next Page</a></body></html>";
-	//manuelles Weiterklicken
-	//echo "<html><head></head><body><a href=\"".$next_page."\">Next Page</a></body></html>"; 
+	//move on by clicking
+	//echo "<html><head></head><body><a href=\"".$next_page."\">Next Page</a></body></html>";
 }
 ?>
 

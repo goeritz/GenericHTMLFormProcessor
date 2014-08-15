@@ -8,8 +8,8 @@
 	require_once('fetch_data.inc.php');
 ?>
 
-2. if the page that reuses the data is the final page of the study, e.g. the user will not input any new data to be stored
-   then add the following snippet at the very bottom of this questionary page:
+2. if the page that reuses the data is the final page (i.e., the user will not input any new data to be stored)
+   add the following snippet at the  bottom of this page:
 
 <?php
 	session_destroy();
