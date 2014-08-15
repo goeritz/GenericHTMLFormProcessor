@@ -25,17 +25,11 @@ $access = array(
 if(isset($_POST['GHFPvar_user'])){
 	$user = $_POST['GHFPvar_user'];
 }
-else if($_POST['username']){
-	$user = $_POST['username'];
-}
 else{
 	$user = null;
 }
 if(isset($_POST['GHFPvar_password'])){
 	$pass = $_POST['GHFPvar_password'];
-}
-else if($_POST['password']){
-	$pass = $_POST['password'];
 }
 else{
 	$pass = null;

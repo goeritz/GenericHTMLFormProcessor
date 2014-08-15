@@ -70,13 +70,6 @@ $unsafe_variables_keys = array_filter(array_keys($unsafe_data), function($key){
 $unsafe_control_variables = array_intersect_key($unsafe_data, array_flip($unsafe_control_keys));
 $unsafe_variables = array_intersect_key($unsafe_data, array_flip($unsafe_variables_keys));
 
-//Backward compatibility for non-prefixed control variables:
-foreach(array('next_page', 'identification', 'counter') as $value){ // Put all old non-prefixed variables in this array
-	if(!isset($unsafe_control_variables['GHFPvar_' . $value]) && isset($unsafe_variables[$value])){
-		$unsafe_control_variables['GHFPvar_' . $value] = $unsafe_variables[$value];
-	}
-}
-
 //determine whether this was the last page of the questionnaire
 $next_page = $unsafe_control_variables['GHFPvar_next_page'];
 
@@ -282,10 +275,10 @@ if (!isset ($next_page)) {
 //if questionnaire consists of still another html page
 else { //call up next HTML page and pass on ID and counter
 	$_SESSION['counter'] = $_SESSION['counter'];
-	echo "<html><head></head><body onLoad=\"javascript:location.replace('".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."')\">
-<a href=\"".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."\">Next Page</a></body></html>";
+	echo "<html><head></head><body onLoad=\"javascript:location.replace('".$next_page."')\">
+<a href=\"".$next_page."\">Next Page</a></body></html>";
 	//manuelles Weiterklicken
-	//echo "<html><head></head><body><a href=\"".$next_page."?op56=".$_SESSION['identification']."&nr93=".$_SESSION['counter']."\">Next Page</a></body></html>"; 
+	//echo "<html><head></head><body><a href=\"".$next_page."\">Next Page</a></body></html>"; 
 }
 ?>
 
