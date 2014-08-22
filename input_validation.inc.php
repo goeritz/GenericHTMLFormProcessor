@@ -16,6 +16,7 @@
 4b. you may add your own input checks below
 
 */
+if (empty($_POST['GHFPvar_from_page'])) { return; }
 
 if ($_POST['GHFPvar_from_page'] == "1") //HTML form to be validated contains hidden variable "GHFPvar_from_page" with value "1" 
 {
