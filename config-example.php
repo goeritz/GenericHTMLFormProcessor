@@ -9,11 +9,10 @@ Software is "as is," no guarantees or warranties can be made.
 GenericHTMLFormProcessor Configuration
 ================================================================================
 
-This is an example config file for the GenericHTMLFormProcessor.
+This is an example config file for GenericHTMLFormProcessor.
 
-1.) Please set the following parameters according to your project and environment.
-2.) Rename this file to 'config.php' and upload it alongside the generic.php and other
-    extensions to your web hoster.
+1.) Set the following parameters according to your project and environment.
+2.) Rename this file to 'config.php' and upload it alongside generic.php to your web space.
 
 The GenericHTMLFormProcessor parses the input from any HTML form. This script creates a MySQL DB and one table in it
 (if not yet present) containing columns that are named according to the variables that were submitted with the HTML form.
@@ -27,12 +26,12 @@ Authors: Anja S. Göritz <anja /at\ goeritz.net>, Jan Vogt <jan.vogt /at\ me.com
 //to put the customized file 'password_protection.inc.php' in the same folder as this file.
 require_once "password_protection.inc.php";
 
-//the following line should be removed (e.g., simply put // in front) if you dont need input validation. Otherwise you need
+//the following line should be removed (e.g., simply put // in front) if you dont need customized input validation. Otherwise you need
 //to put the customized file 'input_validation.inc.php' in the same folder as this file.
 require_once "input_validation.inc.php";
 
 //three lines you need to edit;
-//please the correct values for your database
+//please enter the correct values for your database
 define('MYSQL_USER', 'username');  //the username for the database (db) (if any), e.g. 'user'
 define('MYSQL_PASSWORD', 'password'); //the password for the db (if any), e.g. 'password'
 define('MYSQL_DB', 'generic_db'); //name to be given to the db, e.g. 'generic_db'
@@ -42,27 +41,25 @@ define('MYSQL_HOST', 'localhost'); //the host or IP address where the db is loca
 define('MYSQL_TABLE', "generic"); //name to be given to the table within the db
 
 // Productive mode:
-// Set to true if the study fully developed and at least all possible branches
-// are run once with all variables set.
+// Set the value to "true" if the study is fully developed and all possible branches
+// have been run once with all variables set.
 // Setting this to true disables all debug information and increases security
 // by disallowing the creation of new columns in tables.
 define('PRODUCTIVE_MODE', false); // Set to true when collecting data
 
-/* Set the value of the following allfieldsfull-variable to "true" if you would
-like to perform a validation on every submitted form element to make sure that it is not blank.
-If you do not wish any validation leave value at "false" */
+/* Set the value to "true" if you like to perform a validation on every submitted form element to make sure that it is not blank.
+If you do not wish any built-in validation leave value at "false" */
 define('ALL_FIELDS_FULL', false);
 
-/* if you have chosen "true" at the above option, edit the message to be
-printed out if any field was left blank by the participant*/
+/* if you have chosen "true" with ALL_FIELDS_FULL, edit the message to be
+printed out if any field is left blank by the participant*/
 define('ERROR_MESSAGE', 'Please fill in all the fields!');
 
-/* Set the value of the order-variable to "false" if you would like to write the
-submitted form variables in chronological order, that is, in the order they were in the html-form
-Set the value of the order-variable to "true" if you would like to write the
-submitted form variables in alphabetical/numerical order; this is indispensable for use with
-SurveyWiz and FactorWiz*/
+/* Set the value to "false" if you like to write the submitted form variables in chronological order, 
+that is, in the order they were in the html-form
+Set the value to "true" if you  like to write the submitted form variables in alphabetical/numerical order; 
+this is indispensable for use with SurveyWiz and FactorWiz*/
 define('ORDER', true);
 
-//edit the thank you text that is shown after participants have submitted the last survey page
+//edit the thank you text that is shown after participants have submitted the last study page
 define('THANK_YOU_TEXT', 'Thank you! Your answers have been saved.');
