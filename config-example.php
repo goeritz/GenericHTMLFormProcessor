@@ -38,7 +38,7 @@ define('MYSQL_DB', 'generic_db'); //name to be given to the db, e.g. 'generic_db
 
 //in most instances, you can leave the following 2 lines as they are
 define('MYSQL_HOST', 'localhost'); //the host or IP address where the db is located
-define('MYSQL_TABLE', "generic"); //name to be given to the table within the db
+define('MYSQL_TABLE', 'generic'); //name to be given to the table within the db
 
 // Productive mode:
 // Set the value to "true" if the study is fully developed and all possible branches
